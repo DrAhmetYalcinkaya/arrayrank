@@ -3,7 +3,7 @@
 export(detect.hits)
 export(extraction)
 export(make.df)
-export(norm)
+export(multinorm)
 export(read.gpr)
 export(replace.low)
 export(store.df)

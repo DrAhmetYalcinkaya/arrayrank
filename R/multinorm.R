@@ -26,7 +26,7 @@
 #' norm_data <- norm(data = your_data, method = "protein", protein = 1)
 #' }
 
-norm <- function(data, method = "quantile", protein = NULL){
+multinorm <- function(data, method = "quantile", protein = NULL){
   data <- as.data.frame(data)
   data[] <- lapply(data, as.numeric)
   if(method == "quantile"){
