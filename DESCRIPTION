@@ -1,0 +1,19 @@
+Package: arrayrank
+Title: Extract antibody array data (.gpr), detect and rank hits
+Version: 0.0.0.9000
+Authors@R: 
+    person("Ahmet", "Yalcinkaya", , "ahyalcinkaya@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-1172-3330"))
+Description: This package uses limma to extract autoantibody data from protein arrays, either from complete arrays like Huprot or custom arrays and chambered/segmented arrays (where a single array is used to analyze multiple patient samples in different blocks). Facilitates background correction, low-value replacement (offset), extraction to a dataframe, normalization (limma betweenarrays, limma quantile, or variable-based), and storable dataset creation. Based on output manipulation, it is then possible to detect variables (proteins) for which increased immunoreactivity is detected based on a number of factors, including fold-change, absolute response, shared hits, and combinations of these features. Allows selection of a control group and groups to be examined for hits.
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    limma,
+    data.table,
+    tidyr,
+    writexl,
+    readxl,
+    tcltk,
+    stats
