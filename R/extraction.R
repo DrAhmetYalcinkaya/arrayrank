@@ -15,7 +15,7 @@
 #' @examples
 #' \dontrun{
 #' # Example usage
-#' extracted_data <- extract.data(data = your_RGList_object)
+#' extracted_data <- extraction(data = your_RGList_object)
 #' }
 extraction <- function(data){
   proteins <- data$genes

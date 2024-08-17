@@ -7,7 +7,7 @@
 make.df(data, array_type)
 }
 \arguments{
-\item{data}{A data frame or data table containing the protein expression data. It should include columns for array, Block (for chambered/segmented arrays), Name, and value.}
+\item{data}{A data frame or data.table containing the protein expression data. It should include columns for array, Block (for chambered/segmented arrays), Name, and value.}
 
 \item{array_type}{A character string specifying the type of array to process. Options are \code{"chambered"}, \code{"segmented"}, or \code{"huprot"}.}
 }
