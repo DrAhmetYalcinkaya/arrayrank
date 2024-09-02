@@ -1,3 +1,5 @@
+library(devtools)
+devtools::install_github("DrAhmetYalcinkaya/arrayrank")
 library(arrayrank)
 library(readxl)
 
@@ -23,6 +25,9 @@ q_data <- readxl::read_xlsx(choose.files())
 # 5. read group info from excel
 groups <- read_xlsx(choose.files())
 groups <- groups[1,-1]
+
+#IMPORTANT: Either add group info into the first column of the backup data manually,
+#or create a separate vector/excel file with the group info for each sample. Code accounts for both methods.
 
 # 6. detect proteins with hits and rank them
 q_result <- detect.hits(q_data, controls = "BD", group_vector = groups, examine = "SSc", sdmean = 0.7,
