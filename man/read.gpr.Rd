@@ -2,15 +2,19 @@
 % Please edit documentation in R/read.gpr.R
 \name{read.gpr}
 \alias{read.gpr}
-\title{Read GenePix Result (GPR) Files}
+\title{Read GenePix Result (GPR) Files and Simple Background Correction if Applicable}
 \usage{
-read.gpr()
+read.gpr(bgcorrect = T)
+}
+\arguments{
+\item{bgcorrect}{a boolean input specifying whether background correction should be done. Default is \code{TRUE}.}
 }
 \value{
-A \code{RGList} object containing raw intensity data from the \code{.gpr} files. If no files are found or if the user cancels the directory selection, \code{NULL} is returned.
+A \code{RGList} object containing raw intensity or background-corrected data from the \code{.gpr} files. If no files are found or if the user cancels the directory selection, \code{NULL} is returned.
 }
 \description{
 This function allows users to select a directory and read all \code{.gpr} files within it. The function uses the \code{limma} package to load the raw data from GenePix Result files, which are commonly used in microarray analysis.
+Additionally, a check is performed to confirm the presence of background measurements. If present, limma::backgroundCorrect is applied with the \code{subtract} method.
 }
 \examples{
 \dontrun{

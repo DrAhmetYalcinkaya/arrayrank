@@ -31,17 +31,17 @@ multinorm <- function(data, method = "quantile", protein = NULL){
   data[] <- lapply(data, as.numeric)
   if(method == "quantile"){
     output <- as.data.frame(limma::normalizeQuantiles(data))
-    print("Normalized each column (observations) with limma-Quantile.")
+    message("Normalized each column (observations) with limma-Quantile.")
   } else if(method == "arrays"){
     output <- as.data.frame(limma::normalizeBetweenArrays(data))
-    print("Normalized between arrays (Blocks or Huprot) with limma-Betweenarrays.")
+    message("Normalized between arrays (Blocks or Huprot) with limma-Betweenarrays.")
   } else if(method == "protein"){
     if(is.null(protein) || protein > nrow(data) || protein <= 0){
       stop("Please provide a valid row index for the protein parameter.")
     }
     min_max_ratio <- (1 / (data[protein,] / max(data[protein,])))
     output <- sweep(data, 2, as.numeric(min_max_ratio), `*`)
-    print(paste("Normalized according to", rownames(data[protein,]), "values."))
+    message(paste("Normalized according to", rownames(data[protein,]), "values."))
   } else {
     stop("Please define normalization parameters correctly.")
   }

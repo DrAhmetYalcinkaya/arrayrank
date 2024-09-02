@@ -4,16 +4,20 @@
 \alias{extraction}
 \title{Extract Data from RGList Object}
 \usage{
-extraction(data)
+extraction(data, array_type, format = "wide")
 }
 \arguments{
 \item{data}{An \code{RGList} object containing gene expression data, typically produced by the \code{limma} package's \code{read.maimages} function. The object should include \code{genes}, \code{targets}, and \code{R} components.}
+
+\item{array_type}{A character string specifying the type of array to process. Options are \code{"chambered"}, \code{"segmented"}, or \code{"huprot"}.}
+
+\item{format}{A character string specifying the type of dataframe to be used for the output. Options are \code{"wide"} or \code{"long"}.}
 }
 \value{
 A data frame containing protein information, array identifiers, and corresponding intensity values, with one row per protein-array combination.
 }
 \description{
-This function extracts protein data, array information, and intensity values from an \code{RGList} object (typically produced by the \code{limma} package) and returns a combined data frame.
+This function extracts protein data, array information, and intensity values from an \code{RGList} object (typically produced by the \code{limma} package) and returns a combined data frame. Based on user input, the dataframe can be in wide or long format.
 }
 \examples{
 \dontrun{

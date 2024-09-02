@@ -33,13 +33,6 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
                         sdmean = 0.7, min_mean = 250,
                         fold_threshold = 10, absolute_threshold = 7000,
                         fold_shared = 1, abs_shared = 1) {
-  # Function implementation here...
-}
-
-detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
-                        sdmean = 0.7, min_mean = 250,
-                        fold_threshold = 10, absolute_threshold = 7000,
-                        fold_shared = 1, abs_shared = 1) {
   # Convert to a data frame if it's not already (handling tibbles)
   if ("tbl_df" %in% class(data)) {
     data <- as.data.frame(data)
@@ -62,7 +55,7 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
     cat("The first row is numeric (array data?) and no group_vector has been provided.\nINFO: This function can accept groups as a character vector (group_vector = '')\nor as character entries in the first row of the dataset.\nPlease provide group info as such.\n")
     stop()
   } else {
-    print("The first row appears to contain group data, analyzing based on these groups")
+    message("The first row appears to contain group data, analyzing based on these groups")
     groups <- as.character(data[1, -1])
     proteins <- as.character(data[-c(1), 1])
     data <- data[-c(1), -1]
@@ -90,8 +83,8 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
   }
 
   # Check and print out groups being analyzed
-  print(paste("Selected control group:", controls))
-  print(paste("Selected analysis group:", paste(unique(groups[non_control_indices]), collapse=", ")))
+  message(paste("Selected control group:", controls))
+  message(paste("Selected analysis group:", paste(unique(groups[non_control_indices]), collapse=", ")))
 
   # Check if the standard deviation-to-mean ratio is greater than sdmean value
   variation <- function(row, ratio) {
@@ -103,13 +96,13 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
   filter_variance <- apply(as.matrix(data[, non_control_indices]), 1, variation, sdmean)
   edf2 <- data[filter_variance, ]
   proteins <- proteins[filter_variance]  # adjust the 'proteins' list with the same filter
-  print(paste("Filtered data based on variance:", nrow(edf2)))
+  message(paste("Filtered data based on variance:", nrow(edf2)))
 
   # Filter rows based on the mean value of each row in the non-control data
   filter_minmean <- apply(edf2[, non_control_indices], 1, function(row) mean(row) > min_mean)
   edf3 <- edf2[filter_minmean, ]
   proteins <- proteins[filter_minmean]
-  print(paste("Filtered data based on mean value:", nrow(edf3)))
+  message(paste("Filtered data based on mean value:", nrow(edf3)))
 
   # Calculate the mean value for controls while excluding the highest value
   edf3$ControlMean <- apply(edf3[, control_indices], 1, function(row) mean(row[row != max(row)]))
@@ -118,19 +111,19 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
   filter_greatercontrols <- edf3$ControlMean < apply(edf3[, non_control_indices], 1, max)
   edf4 <- edf3[filter_greatercontrols, ]
   proteins <- proteins[filter_greatercontrols]
-  print(paste("Filtered data based on greater-than-controls check:", nrow(edf4)))
+  message(paste("Filtered data based on greater-than-controls check:", nrow(edf4)))
 
   # Filter based on fold change
   filter_folddif <- rowSums(edf4[, non_control_indices] > fold_threshold * edf4$ControlMean) > (fold_shared - 1)
   edf5 <- edf4[filter_folddif, ]
   proteins <- proteins[filter_folddif]
-  print(paste("Filtered data based on fold difference:", nrow(edf5)))
+  message(paste("Filtered data based on fold difference:", nrow(edf5)))
 
   # Filter based on absolute difference
   filter_absdif <- rowSums(edf5[, non_control_indices] > absolute_threshold) > (abs_shared - 1)
   edf6 <- edf5[filter_absdif, ]
   proteins <- proteins[filter_absdif]
-  print(paste("Filtered data based on absolute difference:", nrow(edf6)))
+  message(paste("Filtered data based on absolute difference:", nrow(edf6)))
 
   # Extract absolute values of non-control samples
   abs_values_non_controls <- edf6[, non_control_indices]
@@ -148,14 +141,14 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
 
   # Sum the scores for each non-control to create final ranking score
   rankingscore <- (rowSums(score_foldchange_and_log10) * number_of_hits * log10(edf6$ControlMean))
-  print("Rank scores calculated")
+  message("Rank scores calculated")
 
   # Add ranking score, highest fold change, number of hits, and BDmean to the dataframe
   abs_values_non_controls$highest_fold_change <- fold_change_values[, 1]
   abs_values_non_controls$potential_hits <- number_of_hits
   abs_values_non_controls$control_mean <- edf6$ControlMean
   abs_values_non_controls$rankingscore <- rankingscore
-  print("Supportive info added.")
+  message("Supportive info added.")
 
   # Add a rank column to the dataframe (convenience)
   abs_values_non_controls$rank <- rank(-abs_values_non_controls$rankingscore)

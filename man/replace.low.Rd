@@ -4,13 +4,7 @@
 \alias{replace.low}
 \title{Replace Low Values in Data}
 \usage{
-replace.low(
-  data,
-  offset = 10,
-  strategy = "computed",
-  fix = offset,
-  verbose = TRUE
-)
+replace.low(data, offset = 10, strategy = "computed", fix = offset)
 }
 \arguments{
 \item{data}{A data frame containing numeric values, such as protein expression data.}
@@ -19,9 +13,7 @@ replace.low(
 
 \item{strategy}{A character string specifying the replacement strategy: \code{"computed"} for a computed value (default), \code{"fixed"} for a fixed replacement value, or \code{"random"} for adding small random noise.}
 
-\item{fix}{A numeric value used when \code{strategy} is \code{"fixed"}. Default is \code{offset}.}
-
-\item{verbose}{A logical value indicating whether to print the number of replacements made. Default is TRUE.}
+\item{fix}{A numeric value used only when \code{strategy} is \code{"fixed"}. Default is defined as the \code{offset} value given by the user.}
 }
 \value{
 A data frame with low values replaced based on the specified offset and strategy.

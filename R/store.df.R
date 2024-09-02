@@ -20,6 +20,6 @@
 store.df <- function(data){
   protein_names <- rownames(data)
   output <- cbind(protein_names, data)
-  print("Storable dataframe created for export into Excel.")
+  message("Storable dataframe created for export into Excel.")
   return(output)
 }
