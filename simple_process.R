@@ -1,3 +1,6 @@
+remove.packages("arrayrank")
+detach("package:arrayrank", unload = TRUE)
+
 library(devtools)
 devtools::install_github("DrAhmetYalcinkaya/arrayrank")
 library(arrayrank)
@@ -32,4 +35,4 @@ groups <- groups[1,]
 q_result <- detect.hits(q_data, controls = "BD", group_vector = groups, examine = "SSc", sdmean = 0.7,
                            fold_threshold = 10, absolute_threshold = 8000)
 
-# If group data were added into the backup data file, then remove "group_vector = groups" before running.
+# If group data were added into the backup data file (so there is no 'groups' vector), remove "group_vector = groups" before running.
