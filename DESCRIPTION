@@ -1,5 +1,5 @@
 Package: arrayrank
-Title: Extract response data from bead-based arrays (.gpr) and detect hits
+Title: Extract response data from planar arrays (.gpr) and detect hits
 Version: 0.9.2
 Authors@R: 
     person("Ahmet", "Yalcinkaya", , "ahyalcinkaya@gmail.com", role = c("aut", "cre"),
