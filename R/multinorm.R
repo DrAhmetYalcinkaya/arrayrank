@@ -75,7 +75,6 @@ multinorm <- function(data, method = "quantile", protein = NULL){
     }
     protein_mean <- mean(as.numeric(data[protein,]))
     mean_sample_ratio <- (protein_mean / data[protein,])
-    print(mean_sample_ratio)
     output <- sweep(data, 2, as.numeric(mean_sample_ratio), `*`)
     message(paste("Normalized according to", rownames(data)[protein], "values."))
     message(paste("NOTES: Max value in input data was:", max(data), "\nMax value in output data is:", round(max(output),2),

@@ -11,12 +11,16 @@ library(arrayrank)
 raw_data <- read.gpr(bgcorrect = T)
 wide_df <- extraction(raw_data, array_type = "chambered", format = "wide")
 
+
+library(tidyr)
+library(dplyr)
 # 1b. identify discordant duplicates in data (to cross-check with ultimate output)
 discordants <- discordant(raw_data, fold = 1.5, abs = 1000)
 
 # 2. data correction
 corr_df <- replace.low(wide_df, offset = 10)
-qnorm_df <- multinorm(corr_df, method= "quantile")
+qnorm_df <- multinorm(corr_df, method= "protein", protein = 447)
+max(qnorm_df)
 
 # 3. storage and backup
 qstore_df <- store.df(qnorm_df)
