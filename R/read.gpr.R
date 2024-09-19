@@ -14,6 +14,8 @@
 #' @import tidyr
 #' @import writexl
 #' @import readxl
+#' @importFrom stats median runif sd
+#' @importFrom utils choose.dir
 #'
 #' @examples
 #' \dontrun{
