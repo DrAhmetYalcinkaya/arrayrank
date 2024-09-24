@@ -8,8 +8,9 @@ library(arrayrank)
 #Example process
 
 # 1. collect gpr data and make dataset
-raw_data <- read.gpr(bgcorrect = T)
+raw_data2 <- read.gpr(bgcorrect = T, fdata = "median")
 wide_df <- extraction(raw_data, array_type = "chambered", format = "wide")
+wide_df2 <- extraction(raw_data2, array_type = "chambered", format = "wide")
 
 # 1b. identify discordant duplicates in data (to cross-check with ultimate output)
 discordants <- discordant(raw_data, fold = 1.5, abs = 1000)

@@ -47,7 +47,7 @@ multinorm <- function(data, method = "quantile", protein = NULL){
     excluded_columns <- data[, cut_lows, drop = FALSE]
 
     message("It appears that ", paste(colnames(data)[cut_lows], collapse = ", "),
-            " are negative controls (non-sample).\nHighly suggested to exclude these indices from normalization.")
+            " is/are negative controls (non-sample).\nHighly suggested to exclude these indices from normalization.")
     response <- readline(prompt = "Would you like to exclude these indices from normalization? Enter 'yes' or 'no': ")
 
     if (tolower(response) == "yes") {

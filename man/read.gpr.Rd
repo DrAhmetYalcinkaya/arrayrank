@@ -4,9 +4,11 @@
 \alias{read.gpr}
 \title{Read GenePix Result (GPR) Files and Simple Background Correction if Applicable}
 \usage{
-read.gpr(bgcorrect = T)
+read.gpr(fdata = "mean", bgcorrect = T)
 }
 \arguments{
+\item{fdata}{select median or mean. Defaults to \code{mean}}
+
 \item{bgcorrect}{a boolean input specifying whether background correction should be done. Default is \code{TRUE}.}
 }
 \value{

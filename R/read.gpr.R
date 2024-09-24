@@ -4,6 +4,7 @@
 #' Additionally, a check is performed to confirm the presence of background measurements. If present, limma::backgroundCorrect is applied with the `subtract` method.
 #'
 #' @param bgcorrect a boolean input specifying whether background correction should be done. Default is `TRUE`.
+#' @param fdata select median or mean. Defaults to `mean`
 #'
 #' @return A `RGList` object containing raw intensity or background-corrected data from the `.gpr` files. If no files are found or if the user cancels the directory selection, `NULL` is returned.
 #' @export
@@ -22,7 +23,7 @@
 #' # Run the function to select a directory and read .gpr files
 #' raw_data <- read.gpr()
 #' }
-read.gpr <- function(bgcorrect = T) {
+read.gpr <- function(fdata = "mean", bgcorrect = T) {
   if (.Platform$OS.type == "windows") {
     directory <- choose.dir()
   } else {
@@ -39,8 +40,13 @@ read.gpr <- function(bgcorrect = T) {
     message("No .gpr files found in the selected directory.")
     return(NULL)
   }
-  raw_data <- limma::read.maimages(files, source = "genepix")
-  raw_data$targets$FileName <- basename(raw_data$targets$FileName)
+  if(fdata == "mean"){
+    raw_data <- limma::read.maimages(files, source = "genepix")
+    raw_data$targets$FileName <- basename(raw_data$targets$FileName)
+  } else {
+    raw_data <- limma::read.maimages(files, source = "genepix.median")
+    raw_data$targets$FileName <- basename(raw_data$targets$FileName)
+  }
 
 
   elements <- c("R", "G", "Rb", "Gb")
