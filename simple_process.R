@@ -4,20 +4,20 @@ detach("package:arrayrank", unload = TRUE)
 library(devtools)
 devtools::install_github("DrAhmetYalcinkaya/arrayrank")
 library(arrayrank)
+library(dplyr)
 
 #Example process
 
 # 1. collect gpr data and make dataset
-raw_data2 <- read.gpr(bgcorrect = T, fdata = "median")
+raw_data <- read.gpr(bgcorrect = T, fdata = "median")
 wide_df <- extraction(raw_data, array_type = "chambered", format = "wide")
-wide_df2 <- extraction(raw_data2, array_type = "chambered", format = "wide")
 
 # 1b. identify discordant duplicates in data (to cross-check with ultimate output)
-discordants <- discordant(raw_data, fold = 1.5, abs = 1000)
+discordants <- discordant(raw_data, array_type = "chambered", fold = 1.5, abs = 1000)
 
 # 2. data correction
 corr_df <- replace.low(wide_df, offset = 10)
-qnorm_df <- multinorm(corr_df, method= "protein", protein = 447)
+qnorm_df <- multinorm(corr_df, method= "quantile")
 
 # 3. storage and backup
 qstore_df <- store.df(qnorm_df)

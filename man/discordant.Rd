@@ -4,7 +4,7 @@
 \alias{discordant}
 \title{Identify Discordant Duplicates in Microarray Data (.gpr read by limma)}
 \usage{
-discordant(data, fold = 1.5, abs = 500)
+discordant(data, array_type, fold = 1.5, abs = 500)
 }
 \arguments{
 \item{data}{An \code{RGList} object containing microarray data, specifically with components \code{genes} and \code{R}.}

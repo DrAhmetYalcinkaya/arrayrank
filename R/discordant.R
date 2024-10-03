@@ -17,25 +17,40 @@
 #' # Assuming 'raw_data' is an RGList object obtained from read.gpr()
 #' discordant_duplicates <- discordant(data = raw_data)
 #' }
-discordant <- function(data, fold = 1.5, abs = 500){
+discordant <- function(data, array_type, fold = 1.5, abs = 500){
   df <- data$genes
   merged_df <- cbind(df, data$R)
   colnames(merged_df) <- basename(colnames(merged_df))
 
   long_df <- tidyr::pivot_longer(merged_df, cols = 6:ncol(merged_df))
   colnames(long_df)[6] <- "array_name"
-
-  result <- long_df %>%
-    dplyr::group_by(array_name, Block, Name) %>%
-    dplyr::filter(dplyr::n() == 2) %>%
-    dplyr::summarize(
-      dup1 = dplyr::first(value),
-      dup2 = dplyr::last(value),
-      dup_mean = mean(value),
-      ratio = ifelse(min(value) == 0, 999, round(abs(max(value) / min(value)), 2)),
-      abs_diff = abs(dplyr::first(value) - dplyr::last(value)),
-      .groups = 'drop'
-    )
+  if(array_type == "chambered" || array_type == "segmented"){
+    result <- long_df %>%
+      dplyr::group_by(array_name, Block, Name) %>%
+      dplyr::filter(dplyr::n() == 2) %>%
+      dplyr::summarize(
+        dup1 = dplyr::first(value),
+        dup2 = dplyr::last(value),
+        dup_mean = mean(value),
+        ratio = ifelse(min(value) == 0, 999, round(abs(max(value) / min(value)), 2)),
+        abs_diff = abs(dplyr::first(value) - dplyr::last(value)),
+        .groups = 'drop'
+      )
+  } else if(array_type == "huprot"){
+    result <- long_df %>%
+      dplyr::group_by(array_name, Name) %>%
+      dplyr::filter(dplyr::n() == 2) %>%
+      dplyr::summarize(
+        dup1 = dplyr::first(value),
+        dup2 = dplyr::last(value),
+        dup_mean = mean(value),
+        ratio = ifelse(min(value) == 0, 999, round(abs(max(value) / min(value)), 2)),
+        abs_diff = abs(dplyr::first(value) - dplyr::last(value)),
+        .groups = 'drop'
+      )
+  } else {
+      stop("Please define array_type. Accepts: huprot, chambered or segmented.")
+    }
 
   flagged <- result %>%
     dplyr::mutate(flag = ifelse(
