@@ -5,6 +5,7 @@
 #' @param data An \code{RGList} object containing microarray data, specifically with components \code{genes} and \code{R}.
 #' @param fold A numeric value specifying the fold-change threshold for identifying discordance between duplicates. Defaults to \code{1.5}.
 #' @param abs A numeric value specifying the absolute difference threshold for identifying discordance between duplicates. Defaults to \code{500}.
+#' @param array_type A string defining the type of array being examined. Possible entries: "huprot", "chambered", "segmented".
 #'
 #' @return A data frame containing the discordant duplicates, including columns for array name, block, gene name, duplicate intensities, mean intensity, fold-change ratio, absolute difference, and a flag indicating discordance.
 #' @export

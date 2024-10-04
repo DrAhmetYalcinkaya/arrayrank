@@ -9,6 +9,8 @@ discordant(data, array_type, fold = 1.5, abs = 500)
 \arguments{
 \item{data}{An \code{RGList} object containing microarray data, specifically with components \code{genes} and \code{R}.}
 
+\item{array_type}{A string defining the type of array being examined. Possible entries: "huprot", "chambered", "segmented".}
+
 \item{fold}{A numeric value specifying the fold-change threshold for identifying discordance between duplicates. Defaults to \code{1.5}.}
 
 \item{abs}{A numeric value specifying the absolute difference threshold for identifying discordance between duplicates. Defaults to \code{500}.}

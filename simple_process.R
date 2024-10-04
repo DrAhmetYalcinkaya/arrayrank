@@ -17,7 +17,7 @@ discordants <- discordant(raw_data, array_type = "chambered", fold = 1.5, abs = 
 
 # 2. data correction
 corr_df <- replace.low(wide_df, offset = 10)
-qnorm_df <- multinorm(corr_df, method= "quantile")
+qnorm_df <- multinorm(corr_df, method= "ig")
 
 # 3. storage and backup
 qstore_df <- store.df(qnorm_df)

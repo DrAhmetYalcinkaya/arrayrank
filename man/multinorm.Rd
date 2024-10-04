@@ -4,14 +4,12 @@
 \alias{multinorm}
 \title{Normalize Data}
 \usage{
-multinorm(data, method = "quantile", protein = NULL)
+multinorm(data, method = "quantile")
 }
 \arguments{
 \item{data}{A data frame containing the protein expression data, where rows represent proteins and columns represent different samples.}
 
-\item{method}{A character string specifying the normalization method to use. Options are \code{"quantile"}, \code{"arrays"}, or \code{"protein"}. Default is \code{"quantile"}.}
-
-\item{protein}{An optional integer specifying the row index of the protein to use for normalization when \code{method = "protein"}.}
+\item{method}{A character string specifying the normalization method to use. Options are \code{"quantile"}, \code{"arrays"}, or \code{"ig"}. Default is \code{"quantile"}.}
 }
 \value{
 A data frame with normalized protein expression values.
@@ -28,6 +26,6 @@ norm_data <- norm(data = your_data, method = "quantile")
 norm_data <- norm(data = your_data, method = "arrays")
 
 # Protein-based normalization
-norm_data <- norm(data = your_data, method = "protein", protein = 1)
+norm_data <- norm(data = your_data, method = "ig")
 }
 }
