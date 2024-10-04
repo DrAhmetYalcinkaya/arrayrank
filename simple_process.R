@@ -1,10 +1,9 @@
+library(devtools)
 remove.packages("arrayrank")
 detach("package:arrayrank", unload = TRUE)
 
-library(devtools)
 devtools::install_github("DrAhmetYalcinkaya/arrayrank")
 library(arrayrank)
-library(dplyr)
 
 #Example process
 

@@ -43,14 +43,19 @@ multinorm <- function(data, method = "quantile"){
   }
 
   ortalamalar <- apply(selected, 2, mean)
-  beta <- mean(unlist(selected))
+  beta <- median(unlist(selected))
 
-  logistic_transform <- function(x, b = beta) {
-    a <- ifelse(x < b/5, 0.005, ifelse(x < b, 0.0005, 0.00025))
-    1 / (1 + exp(-a * (x - b)))
-  }
-  log_trans <- logistic_transform(ortalamalar)
-  binary <- ifelse(log_trans > 0.075, T, F)
+  logistic_trans <- Vectorize(function(x, b = beta, alt = 0.8, ust = 1.8) {
+    if (x < b/4) {
+      a = 0.009
+      return(1 / (1 + exp(-a * (x-b))))
+    } else {
+      a = 0.001
+      return(alt + (ust-alt) / (1 + exp(-a * (b-x))))
+    }
+  })
+  log_trans <- logistic_trans(ortalamalar)
+  binary <- ifelse(log_trans > 0.01, T, F)
 
   if (sum(!binary) > 0) {
     post_data <- data[, binary, drop = F]
@@ -76,15 +81,10 @@ multinorm <- function(data, method = "quantile"){
     message("Normalized between arrays (Blocks or Huprot) with limma-BetweenArrays.")
 
   } else if(method == "ig"){
-    oranlar <- max(ortalamalar) / ortalamalar
-    k <- round(log_trans * oranlar,3)
-    k <- ifelse(k < 0.05, 1, k)
-    ####placeholder for now:
-    k <- ifelse(k < 0.7, 0.7, k)
-    ####until better solution comes up.
-    df2 <- df <- data
+    df <- data
     for(i in 1:ncol(df)){
-      df2[, i] <- df[, i] * k[i]
+      k <- ifelse(log_trans < 0.1, 1, log_trans)
+      df[, i] <- data[, i] * k[i]
       output <- round(df2,1)
     }
     message("Normalized for Ig values.")
