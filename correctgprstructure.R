@@ -2,10 +2,10 @@
 library(data.table)
 
 # Specify the directory containing the .gpr files
-input_directory <- "path_to_your_gpr_files"
+input_directory <- choose.dir()
 
 # Specify the directory to save the modified files
-output_directory <- "path_to_save_modified_gpr_files"
+output_directory <- choose.dir()
 
 # Create the output directory if it doesn't exist
 if (!dir.exists(output_directory)) {
@@ -13,7 +13,7 @@ if (!dir.exists(output_directory)) {
 }
 
 # Get a list of all .gpr files in the input directory
-gpr_files <- list.files(input_directory, pattern = "\\.gpr$", full.names = TRUE)
+gpr_files <- list.files(input_directory, pattern = "\\.gpr$", full.names = T)
 
 # Function to remove content after '=' for specific keys
 remove_content_after_equal <- function(file) {
