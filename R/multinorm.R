@@ -85,7 +85,7 @@ multinorm <- function(data, method = "quantile"){
     for(i in 1:ncol(df)){
       k <- ifelse(log_trans < 0.1, 1, log_trans)
       df[, i] <- data[, i] * k[i]
-      output <- round(df2,1)
+      output <- round(df,1)
     }
     message("Normalized for Ig values.")
   } else {
