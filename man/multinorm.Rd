@@ -9,7 +9,7 @@ multinorm(data, method = "quantile")
 \arguments{
 \item{data}{A data frame containing the protein expression data, where rows represent proteins and columns represent different samples.}
 
-\item{method}{A character string specifying the normalization method to use. Options are \code{"quantile"}, \code{"arrays"}, or \code{"ig"}. Default is \code{"quantile"}.}
+\item{method}{A character string specifying the normalization method to use. Options are "quantile", "arrays", or "ig". Default is "quantile".}
 }
 \value{
 A data frame with normalized protein expression values.
@@ -20,12 +20,12 @@ This function normalizes a data frame of protein expression data using different
 \examples{
 \dontrun{
 # Quantile normalization
-norm_data <- norm(data = your_data, method = "quantile")
+norm_data <- multinorm(data = your_data, method = "quantile")
 
 # Between-array normalization
-norm_data <- norm(data = your_data, method = "arrays")
+norm_data <- multinorm(data = your_data, method = "arrays")
 
 # Protein-based normalization
-norm_data <- norm(data = your_data, method = "ig")
+norm_data <- multinorm(data = your_data, method = "ig")
 }
 }

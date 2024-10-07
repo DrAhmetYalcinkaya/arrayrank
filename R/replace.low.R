@@ -4,15 +4,10 @@
 #'
 #' @param data A data frame containing numeric values, such as protein expression data.
 #' @param offset A numeric value specifying the threshold below which values will be replaced. Default is 10.
-#' @param strategy A character string specifying the replacement strategy: `"computed"` for a computed value (default), `"fixed"` for a fixed replacement value, or `"random"` for adding small random noise.
-#' @param fix A numeric value used only when `strategy` is `"fixed"`. Default is defined as the `offset` value given by the user.
+#' @param strategy A character string specifying the replacement strategy: "computed" for a computed value (default), "fixed" for a fixed replacement value, or "random" for adding small random noise.
+#' @param fix A numeric value used only when `strategy` is "fixed". Default is defined as the `offset` value given by the user.
 #'
 #' @return A data frame with low values replaced based on the specified offset and strategy.
-#' @import limma
-#' @import data.table
-#' @import tidyr
-#' @import writexl
-#' @import readxl
 #' @export
 #'
 #' @examples
@@ -26,7 +21,7 @@
 #' # Replace low values with small random noise
 #' corrected_data <- replace.low(data = your_data, offset = 10, strategy = "random")
 #' }
-replace.low <- function(data, offset = 10, strategy = "computed", fix = offset){
+replace.low <- function(data, offset = 10, strategy = "computed", fix = offset) {
   data <- as.data.frame(data)
   numeric_columns <- sapply(data, is.numeric)
 

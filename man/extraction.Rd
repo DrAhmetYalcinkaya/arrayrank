@@ -2,26 +2,37 @@
 % Please edit documentation in R/extraction.R
 \name{extraction}
 \alias{extraction}
-\title{Extract Data from RGList Object}
+\title{Extract Protein Data from Limma-read Array Data (RGList Object)}
 \usage{
 extraction(data, array_type, format = "wide")
 }
 \arguments{
-\item{data}{An \code{RGList} object containing gene expression data, typically produced by the \code{limma} package's \code{read.maimages} function. The object should include \code{genes}, \code{targets}, and \code{R} components.}
+\item{data}{An \code{RGList} object containing microarray data, specifically with \code{genes} (vector), \code{targets} (list), and \code{R} (matrix) representing protein data, target files, and measurement values respectively.}
 
-\item{array_type}{A character string specifying the type of array to process. Options are \code{"chambered"}, \code{"segmented"}, or \code{"huprot"}.}
+\item{array_type}{A character string specifying the type of array used in the analysis. Must be one of "chambered", "segmented", or "huprot".}
 
-\item{format}{A character string specifying the type of dataframe to be used for the output. Options are \code{"wide"} or \code{"long"}.}
+\item{format}{A character string specifying the format of the output. Either "wide" (default) or "long".}
 }
 \value{
-A data frame containing protein information, array identifiers, and corresponding intensity values, with one row per protein-array combination.
+A data frame containing the extracted and arranged data in the specified format. The data frame contains calculated mean values for each group, with columns that vary depending on the specified \code{array_type} and \code{format}.
 }
 \description{
-This function extracts protein data, array information, and intensity values from an \code{RGList} object (typically produced by the \code{limma} package) and returns a combined data frame. Based on user input, the dataframe can be in wide or long format.
+Extracts protein data from different types of arrays and outputs it in either long or wide format.
 }
 \examples{
+raw_data <- list(genes = genes_vector, targets = targets_list, R = values_matrix)
+extraction(data = raw_data, array_type = "chambered", format = "long")
+extraction(data = raw_data, array_type = "segmented", format = "wide")
+extraction(data = raw_data, array_type = "huprot", format = "long")
+
 \dontrun{
-# Example usage
-extracted_data <- extraction(data = your_RGList_object)
+# Assuming 'raw_data' is an RGList object obtained from read.gpr()
+Meaning run read.gpr first!
+
+# Extract data in long format for chambered arrays
+long_data <- extraction(data = raw_data, array_type = "chambered", format = "long")
+
+# Extract data in wide format for huprot arrays
+wide_data <- extraction(data = raw_data, array_type = "huprot", format = "wide")
 }
 }

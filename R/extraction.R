@@ -1,23 +1,32 @@
-#' Extract Data from RGList Object
+#' Extract Protein Data from Limma-read Array Data (RGList Object)
 #'
-#' This function extracts protein data, array information, and intensity values from an `RGList` object (typically produced by the `limma` package) and returns a combined data frame. Based on user input, the dataframe can be in wide or long format.
+#' Extracts protein data from different types of arrays and outputs it in either long or wide format.
 #'
-#' @param data An `RGList` object containing gene expression data, typically produced by the `limma` package's `read.maimages` function. The object should include `genes`, `targets`, and `R` components.
-#' @param array_type A character string specifying the type of array to process. Options are `"chambered"`, `"segmented"`, or `"huprot"`.
-#' @param format A character string specifying the type of dataframe to be used for the output. Options are `"wide"` or `"long"`.
+#' @param data An \code{RGList} object containing microarray data, specifically with `genes` (vector), `targets` (list), and `R` (matrix) representing protein data, target files, and measurement values respectively.
+#' @param array_type A character string specifying the type of array used in the analysis. Must be one of "chambered", "segmented", or "huprot".
+#' @param format A character string specifying the format of the output. Either "wide" (default) or "long".
 #'
-#' @return A data frame containing protein information, array identifiers, and corresponding intensity values, with one row per protein-array combination.
-#' @import limma
-#' @import data.table
-#' @import tidyr
-#' @import writexl
-#' @import readxl
+#' @return A data frame containing the extracted and arranged data in the specified format. The data frame contains calculated mean values for each group, with columns that vary depending on the specified `array_type` and `format`.
 #' @export
 #'
+#' @import dplyr
+#' @import tidyr
+#'
 #' @examples
+#' raw_data <- list(genes = genes_vector, targets = targets_list, R = values_matrix)
+#' extraction(data = raw_data, array_type = "chambered", format = "long")
+#' extraction(data = raw_data, array_type = "segmented", format = "wide")
+#' extraction(data = raw_data, array_type = "huprot", format = "long")
+#'
 #' \dontrun{
-#' # Example usage
-#' extracted_data <- extraction(data = your_RGList_object)
+#' # Assuming 'raw_data' is an RGList object obtained from read.gpr()
+#' Meaning run read.gpr first!
+#'
+#' # Extract data in long format for chambered arrays
+#' long_data <- extraction(data = raw_data, array_type = "chambered", format = "long")
+#'
+#' # Extract data in wide format for huprot arrays
+#' wide_data <- extraction(data = raw_data, array_type = "huprot", format = "wide")
 #' }
 extraction <- function(data, array_type, format = "wide") {
   proteins <- data$genes
@@ -39,33 +48,31 @@ extraction <- function(data, array_type, format = "wide") {
   if (!(array_type %in% c("chambered", "segmented", "huprot"))) {
     stop("Invalid array_type. Please specify 'chambered', 'segmented', or 'huprot'.")
   }
-  # Convert data to data.table format
-  df <- data.table::setDT(df_out)
+
   if (format == "long" & array_type != "huprot") {
-    long_result <- df[, .(Mvalue = mean(.SD$value, na.rm = TRUE)), by = .(array, Block, Name)]
+    long_result <- df_out %>%
+      dplyr::group_by(array, Block, Name) %>%
+      dplyr::summarise(Mvalue = mean(value, na.rm = TRUE))
     output <- long_result
     message("Data calculated/arranged for chambered/segmented arrays")
     message("Long data created based on format input (user defined: long)")
   } else if (format == "long" & array_type == "huprot") {
-    long_result <- df[, .(Mvalue = mean(.SD$value, na.rm = TRUE)), by = .(array, Name)]
-    output <- long_result
+    long_result <- df_out %>%
+      dplyr::group_by(array, Name, Block, Column) %>%
+      dplyr::summarise(Mvalue = mean(value, na.rm = TRUE)) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-Block, -Column) %>%
+      dplyr::group_by(array, Name) %>%
+      dplyr::summarise(Mvalue = if (n() >= 8) mean(Mvalue, na.rm = TRUE) else Mvalue) %>%
+      dplyr::mutate(Name = make.unique(as.character(Name), sep = "."))
     message("Data calculated/arranged for huprot arrays")
     message("Long data created based on format input (user defined: long)")
+    output <- long_result
   } else if (format == "wide") {
-    # Define required columns based on array type
-    required_columns <- if (array_type %in% c("chambered", "segmented")) {
-      c("array", "Block", "Name", "value")
-    } else {
-      c("array", "Name", "value")
-    }
-
-    # Check if the data contains the required columns
-    if (!all(required_columns %in% colnames(df))) {
-      stop(paste("Data must contain the following columns:", paste(required_columns, collapse = ", ")))
-    }
-
     if (array_type == "chambered" || array_type == "segmented") {
-      long_result <- df[, .(Mvalue = mean(.SD$value, na.rm = TRUE)), by = .(array, Block, Name)]
+      long_result <- df_out %>%
+        dplyr::group_by(array, Block, Name) %>%
+        dplyr::summarise(Mvalue = mean(value, na.rm = TRUE))
       wide_result <- tidyr::pivot_wider(long_result, names_from = Name, values_from = Mvalue)
       message("Data calculated/arranged for chambered/segmented arrays")
 
@@ -78,21 +85,29 @@ extraction <- function(data, array_type, format = "wide") {
       numeric_df <- as.data.frame(lapply(corrected_transposed_result, as.numeric))
       numeric_df <- as.data.frame(apply(numeric_df, 2, function(x) round(x, 2)))
       rownames(numeric_df) <- rownames(corrected_transposed_result)
-
     } else if (array_type == "huprot") {
-      long_result <- df[, .(Mvalue = mean(.SD$value, na.rm = TRUE)), by = .(array, Name)]
+      long_result <- df_out %>%
+        dplyr::group_by(array, Name, Block, Column) %>%
+        dplyr::summarise(Mvalue = mean(value, na.rm = TRUE)) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(-Block, -Column) %>%
+        dplyr::group_by(array, Name) %>%
+        dplyr::summarise(Mvalue = if (n() >= 8) mean(Mvalue, na.rm = TRUE) else Mvalue) %>%
+        dplyr::mutate(Name = make.unique(as.character(Name), sep = "."))
       wide_result <- tidyr::pivot_wider(long_result, names_from = Name, values_from = Mvalue)
-      message("Data calculated/arranged for huprot arrays")
+      message("Data calculated/arranged for huprot arrays. Duplicate protein names appended with .n --creating dataframe...")
 
       transposed_result <- as.data.frame(t(wide_result))
       file_names <- as.character(transposed_result[1, ])
       array <- paste0("Arr", sapply(basename(file_names), function(x) gsub("[^0-9]", "", x)))
       new_colname <- array
-      corrected_transposed_result <- transposed_result[-1, ]
+      corrected_transposed_result <- as.data.frame(transposed_result[-1, ])
       colnames(corrected_transposed_result) <- new_colname
+      row_names <- rownames(transposed_result)
+      row_names <- row_names[-1]
       numeric_df <- as.data.frame(lapply(corrected_transposed_result, as.numeric))
       numeric_df <- as.data.frame(apply(numeric_df, 2, function(x) round(x, 2)))
-      rownames(numeric_df) <- rownames(corrected_transposed_result)
+      rownames(numeric_df) <- row_names
     } else {
       stop("Please define array type. Supports 'chambered', 'segmented', or 'huprot'.")
     }

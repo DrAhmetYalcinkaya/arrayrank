@@ -11,9 +11,9 @@ replace.low(data, offset = 10, strategy = "computed", fix = offset)
 
 \item{offset}{A numeric value specifying the threshold below which values will be replaced. Default is 10.}
 
-\item{strategy}{A character string specifying the replacement strategy: \code{"computed"} for a computed value (default), \code{"fixed"} for a fixed replacement value, or \code{"random"} for adding small random noise.}
+\item{strategy}{A character string specifying the replacement strategy: "computed" for a computed value (default), "fixed" for a fixed replacement value, or "random" for adding small random noise.}
 
-\item{fix}{A numeric value used only when \code{strategy} is \code{"fixed"}. Default is defined as the \code{offset} value given by the user.}
+\item{fix}{A numeric value used only when \code{strategy} is "fixed". Default is defined as the \code{offset} value given by the user.}
 }
 \value{
 A data frame with low values replaced based on the specified offset and strategy.

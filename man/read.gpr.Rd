@@ -2,21 +2,20 @@
 % Please edit documentation in R/read.gpr.R
 \name{read.gpr}
 \alias{read.gpr}
-\title{Read GenePix Result (GPR) Files and Simple Background Correction if Applicable}
+\title{Read GenePix Result (GPR) Files and Perform Background Correction}
 \usage{
-read.gpr(fdata = "mean", bgcorrect = T)
+read.gpr(fdata = "mean", bgcorrect = TRUE)
 }
 \arguments{
-\item{fdata}{select median or mean. Defaults to \code{mean}}
+\item{fdata}{Character; whether to select \code{median} or \code{mean} foreground intensity values. Defaults to \code{"mean"}.}
 
-\item{bgcorrect}{a boolean input specifying whether background correction should be done. Default is \code{TRUE}.}
+\item{bgcorrect}{Logical; whether background correction should be performed. Default is \code{TRUE}.}
 }
 \value{
-A \code{RGList} object containing raw intensity or background-corrected data from the \code{.gpr} files. If no files are found or if the user cancels the directory selection, \code{NULL} is returned.
+An \code{RGList} object containing raw or background-corrected data from the \code{.gpr} files. If no files are found or if the user cancels the directory selection, \code{NULL} is returned.
 }
 \description{
-This function allows users to select a directory and read all \code{.gpr} files within it. The function uses the \code{limma} package to load the raw data from GenePix Result files, which are commonly used in microarray analysis.
-Additionally, a check is performed to confirm the presence of background measurements. If present, limma::backgroundCorrect is applied with the \code{subtract} method.
+Reads all \code{.gpr} files within a selected directory. Utilizes the \code{limma} package to load raw data from GenePix Result files (.gpr). Defaults to performing background correction if specified.
 }
 \examples{
 \dontrun{

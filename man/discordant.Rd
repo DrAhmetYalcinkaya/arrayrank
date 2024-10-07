@@ -2,7 +2,7 @@
 % Please edit documentation in R/discordant.R
 \name{discordant}
 \alias{discordant}
-\title{Identify Discordant Duplicates in Microarray Data (.gpr read by limma)}
+\title{Identify Discordant Duplicates in Microarray Data (GPR Read by Limma)}
 \usage{
 discordant(data, array_type, fold = 1.5, abs = 500)
 }
@@ -24,6 +24,6 @@ This function identifies discordant duplicate spots in microarray data based on 
 \examples{
 \dontrun{
 # Assuming 'raw_data' is an RGList object obtained from read.gpr()
-discordant_duplicates <- discordant(data = raw_data)
+discordant_duplicates <- discordant(data = raw_data, array_type = "chambered")
 }
 }

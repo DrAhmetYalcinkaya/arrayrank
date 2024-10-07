@@ -1,29 +1,22 @@
-#' Read GenePix Result (GPR) Files and Simple Background Correction if Applicable
+#' Read GenePix Result (GPR) Files and Perform Background Correction
 #'
-#' This function allows users to select a directory and read all `.gpr` files within it. The function uses the `limma` package to load the raw data from GenePix Result files, which are commonly used in microarray analysis.
-#' Additionally, a check is performed to confirm the presence of background measurements. If present, limma::backgroundCorrect is applied with the `subtract` method.
+#' Reads all `.gpr` files within a selected directory. Utilizes the `limma` package to load raw data from GenePix Result files (.gpr). Defaults to performing background correction if specified.
 #'
-#' @param bgcorrect a boolean input specifying whether background correction should be done. Default is `TRUE`.
-#' @param fdata select median or mean. Defaults to `mean`
+#' @param bgcorrect Logical; whether background correction should be performed. Default is `TRUE`.
+#' @param fdata Character; whether to select `median` or `mean` foreground intensity values. Defaults to `"mean"`.
 #'
-#' @return A `RGList` object containing raw intensity or background-corrected data from the `.gpr` files. If no files are found or if the user cancels the directory selection, `NULL` is returned.
+#' @return An `RGList` object containing raw or background-corrected data from the `.gpr` files. If no files are found or if the user cancels the directory selection, `NULL` is returned.
 #' @export
 #'
 #' @import limma
 #' @import tcltk
-#' @import data.table
-#' @import tidyr
-#' @import writexl
-#' @import readxl
-#' @importFrom stats median runif sd
-#' @importFrom utils choose.dir
 #'
 #' @examples
 #' \dontrun{
 #' # Run the function to select a directory and read .gpr files
 #' raw_data <- read.gpr()
 #' }
-read.gpr <- function(fdata = "mean", bgcorrect = T) {
+read.gpr <- function(fdata = "mean", bgcorrect = TRUE) {
   if (.Platform$OS.type == "windows") {
     directory <- choose.dir()
   } else {
@@ -34,28 +27,24 @@ read.gpr <- function(fdata = "mean", bgcorrect = T) {
     return(NULL)
   }
 
-  files <- list.files(path = directory, pattern = "*.gpr", full.names = T, include.dirs = F)
+  files <- list.files(path = directory, pattern = "*.gpr", full.names = TRUE, include.dirs = FALSE)
 
   if (length(files) == 0) {
     message("No .gpr files found in the selected directory.")
     return(NULL)
   }
-  if(fdata == "mean"){
-    raw_data <- limma::read.maimages(files, source = "genepix")
-    raw_data$targets$FileName <- basename(raw_data$targets$FileName)
-  } else {
-    raw_data <- limma::read.maimages(files, source = "genepix.median")
-    raw_data$targets$FileName <- basename(raw_data$targets$FileName)
-  }
 
+  source_type <- if (fdata == "mean") "genepix" else "genepix.median"
+  raw_data <- limma::read.maimages(files, source = source_type)
+  raw_data$targets$FileName <- basename(raw_data$targets$FileName)
 
   elements <- c("R", "G", "Rb", "Gb")
-    if (all(elements %in% names(raw_data)) & bgcorrect == T) {
-    message("Red, Green channels and background data found to exist, user requested bg correction; subtracting background.")
-      post_bg <- limma::backgroundCorrect(raw_data, method = "subtract")
-    } else {
-    message("No background subtration performed.")
-      post_bg <- raw_data
+  if (all(elements %in% names(raw_data)) && bgcorrect) {
+    message("Red, Green channels and background data found. Performing background correction.")
+    post_bg <- limma::backgroundCorrect(raw_data, method = "subtract")
+  } else {
+    message("No background correction performed.")
+    post_bg <- raw_data
   }
 
   return(post_bg)

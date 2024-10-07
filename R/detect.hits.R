@@ -14,13 +14,9 @@
 #' @param abs_shared An integer specifying the minimum number of non-control samples that must exceed the absolute threshold. Default is 1.
 #'
 #' @return A data frame of ranked significant protein hits, including the highest fold change, the number of potential hits, control mean expression, and a ranking score.
-#' @import limma
-#' @import data.table
-#' @import tidyr
-#' @import writexl
-#' @import readxl
-#' @import tcltk
 #' @export
+#'
+#' @import dplyr
 #'
 #' @examples
 #' \dontrun{
@@ -47,7 +43,7 @@ detect.hits <- function(data, group_vector = NULL, controls, examine = NULL,
     if (length(group_vector) != ncol(data) - 1) {
       stop("The length of 'group_vector' must match the number of samples in the data (columns except the protein name column).")
     }
-    cat("A group_vector has been provided.\nAnalysis will assume the first row contains array data")
+    cat("A group_vector has been provided.\nAnalysis will assume the first row contains array data.\n\n")
     groups <- as.character(group_vector)
     proteins <- as.character(data[, 1])
     data <- data[, -1]
