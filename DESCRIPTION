@@ -1,6 +1,6 @@
 Package: arrayrank
 Title: Extract response data from planar arrays (.gpr) and detect hits
-Version: 0.9.7
+Version: 0.9.8
 Authors@R: 
     person("Ahmet", "Yalcinkaya", , "ahyalcinkaya@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1172-3330"))
@@ -11,7 +11,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
     limma,
-    data.table,
     tidyr,
     dplyr,
     writexl,

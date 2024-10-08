@@ -20,11 +20,6 @@ A data frame containing the extracted and arranged data in the specified format.
 Extracts protein data from different types of arrays and outputs it in either long or wide format.
 }
 \examples{
-raw_data <- list(genes = genes_vector, targets = targets_list, R = values_matrix)
-extraction(data = raw_data, array_type = "chambered", format = "long")
-extraction(data = raw_data, array_type = "segmented", format = "wide")
-extraction(data = raw_data, array_type = "huprot", format = "long")
-
 \dontrun{
 # Assuming 'raw_data' is an RGList object obtained from read.gpr()
 Meaning run read.gpr first!

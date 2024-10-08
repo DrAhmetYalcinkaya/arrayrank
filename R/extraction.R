@@ -13,11 +13,6 @@
 #' @import tidyr
 #'
 #' @examples
-#' raw_data <- list(genes = genes_vector, targets = targets_list, R = values_matrix)
-#' extraction(data = raw_data, array_type = "chambered", format = "long")
-#' extraction(data = raw_data, array_type = "segmented", format = "wide")
-#' extraction(data = raw_data, array_type = "huprot", format = "long")
-#'
 #' \dontrun{
 #' # Assuming 'raw_data' is an RGList object obtained from read.gpr()
 #' Meaning run read.gpr first!
@@ -50,9 +45,15 @@ extraction <- function(data, array_type, format = "wide") {
   }
 
   if (format == "long" & array_type != "huprot") {
-    long_result <- df_out %>%
-      dplyr::group_by(array, Block, Name) %>%
-      dplyr::summarise(Mvalue = mean(value, na.rm = TRUE))
+    mid <- df_out %>%
+      dplyr::group_by(array, Block, Name, ID) %>%
+      dplyr::summarise(Mvalue = mean(value, na.rm = TRUE)) %>%
+      ungroup()
+    long_result <- mid %>%
+      group_by(array, Block, Name) %>%
+      summarise(Mvalue = if(n() > 5) Mvalue = mean(Mvalue, na.rm = T) else Mvalue) %>%
+      mutate(Name = make.unique(as.character(Name), sep = ".")) %>%
+      ungroup()
     output <- long_result
     message("Data calculated/arranged for chambered/segmented arrays")
     message("Long data created based on format input (user defined: long)")
@@ -70,9 +71,15 @@ extraction <- function(data, array_type, format = "wide") {
     output <- long_result
   } else if (format == "wide") {
     if (array_type == "chambered" || array_type == "segmented") {
-      long_result <- df_out %>%
-        dplyr::group_by(array, Block, Name) %>%
-        dplyr::summarise(Mvalue = mean(value, na.rm = TRUE))
+      mid <- df_out %>%
+        dplyr::group_by(array, Block, Name, ID) %>%
+        dplyr::summarise(Mvalue = mean(value, na.rm = TRUE)) %>%
+        ungroup()
+      long_result <- mid %>%
+        group_by(array, Block, Name) %>%
+        summarise(Mvalue = if(n() > 5) Mvalue = mean(Mvalue, na.rm = T) else Mvalue) %>%
+        mutate(Name = make.unique(as.character(Name), sep = ".")) %>%
+        ungroup()
       wide_result <- tidyr::pivot_wider(long_result, names_from = Name, values_from = Mvalue)
       message("Data calculated/arranged for chambered/segmented arrays")
 
