@@ -28,13 +28,12 @@ q_data <- readxl::read_xlsx(choose.files())
 # 5. read group info from excel (if you want to provide a vector defining the sample groups)
 groups <- readxl::read_xlsx(choose.files())
 groupsv <- t(groups[,2]) ### note: read/create/edit the character vector based on your own requirements!!!
-# adjust groups definition as required.
 
 #IMPORTANT: Either add group info into the first column of the backup data (normed.xlsx for this example) manually,
 #or create a separate vector/excel file with the group info for each sample. Code accounts for both methods.
 
-# 6. detect proteins with hits and rank them (in this example: the groups, BD and SSc, have been provided as a vector)
-q_result1 <- detect.hits(q_data, controls = "BD", group_vector = groupsv, examine = "Pan", sdmean = 0.5,
-                           fold_threshold = 5, absolute_threshold = 5000)
+# 6. detect proteins with hits and rank them (in this example: the groups have been provided as a vector)
+q_result <- detect.hits(q_data, controls = "your_control_group", group_vector = groupsv,
+                        examine = "your_study_group", sdmean = 0.5, fold_threshold = 5, absolute_threshold = 5000)
 
 # If group data were added into the backup data file (so there is no 'groups' vector), remove "group_vector = groups" before running.
