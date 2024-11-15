@@ -12,7 +12,7 @@ raw_data <- read.gpr(bgcorrect = T, fdata = "median")
 wide_df <- extraction(raw_data, array_type = "chambered", format = "wide")
 
 # 1b. identify discordant duplicates in data (to cross-check with ultimate output)
-discordants <- discordant(raw_data, array_type = "chambered", fold = 2, abs = 1000)
+discordants <- discordant(raw_data, array_type = "chambered", fold = 4, abs = 2000)
 
 # 2. data correction
 corr_df <- replace.low(wide_df, offset = 10)
@@ -29,7 +29,7 @@ q_data <- readxl::read_xlsx(choose.files())
 groups <- readxl::read_xlsx(choose.files())
 groupsv <- t(groups[,2]) ### note: read/create/edit the character vector based on your own requirements!!!
 
-#IMPORTANT: Either add group info into the first column of the backup data (normed.xlsx for this example) manually,
+#IMPORTANT: Either add group info into the first row of the backup data (your_file_name.xlsx for this example) manually,
 #or create a separate vector/excel file with the group info for each sample. Code accounts for both methods.
 
 # 6. detect proteins with hits and rank them (in this example: the groups have been provided as a vector)

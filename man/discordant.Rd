@@ -4,16 +4,16 @@
 \alias{discordant}
 \title{Identify Discordant Duplicates in Microarray Data (GPR Read by Limma)}
 \usage{
-discordant(data, array_type, fold = 1.5, abs = 500)
+discordant(data, array_type, fold = 4, abs = 1000)
 }
 \arguments{
 \item{data}{An \code{RGList} object containing microarray data, specifically with components \code{genes} and \code{R}.}
 
 \item{array_type}{A string defining the type of array being examined. Possible entries: "huprot", "chambered", "segmented".}
 
-\item{fold}{A numeric value specifying the fold-change threshold for identifying discordance between duplicates. Defaults to \code{1.5}.}
+\item{fold}{A numeric value specifying the fold-change threshold for identifying discordance between duplicates. Defaults to \code{4}.}
 
-\item{abs}{A numeric value specifying the absolute difference threshold for identifying discordance between duplicates. Defaults to \code{500}.}
+\item{abs}{A numeric value specifying the absolute difference threshold for identifying discordance between duplicates. Defaults to \code{1000}.}
 }
 \value{
 A data frame containing the discordant duplicates, including columns for array name, block, gene name, duplicate intensities, mean intensity, fold-change ratio, absolute difference, and a flag indicating discordance.
