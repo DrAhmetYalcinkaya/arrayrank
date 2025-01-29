@@ -34,14 +34,16 @@ multinorm <- function(data, method = "quantile") {
     grep("goatanti-huig", .) %>%
     data[.,]
   if (nrow(selected) == 0) {
-    selected <- tolower(rownames(data)) %>%
-      {data[grepl("igg", .) & grepl("100ng/ul", .), ]}
+    select <- tolower(rownames(data)) %>%
+      {data[grepl("anti-human igg", .) & grepl("ng/ul", .), ]}
+    selected["anti-human igg 100ng/ul",] <- select["Anti-human IgG 100ng/ul",]
+    selected["anti-human igg 25ng/ul-undiluted",] <- select["Anti-human IgG 25ng/ul",] * 4
   }
 
   ortalamalar <- apply(selected, 2, mean)
   beta <- median(unlist(selected))
 
-  logistic_trans <- Vectorize(function(x, b = beta, alt = 0.8, ust = 1.8) {
+  logistic_trans <- Vectorize(function(x, b = beta, alt = 0.8, ust = 1.5) {
     if (x < b/4) {
       a = 0.009
       return(1 / (1 + exp(-a * (x - b))))

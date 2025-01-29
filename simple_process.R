@@ -1,3 +1,7 @@
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("limma")
+
 library(devtools)
 remove.packages("arrayrank")
 detach("package:arrayrank", unload = TRUE)
@@ -9,10 +13,10 @@ library(arrayrank)
 
 # 1. collect gpr data and make dataset
 raw_data <- read.gpr(bgcorrect = T, fdata = "median")
-wide_df <- extraction(raw_data, array_type = "chambered", format = "wide")
+wide_df <- extraction(raw_data, array_type = "huprot", format = "wide")
 
 # 1b. identify discordant duplicates in data (to cross-check with ultimate output)
-discordants <- discordant(raw_data, array_type = "chambered", fold = 4, abs = 2000)
+discordants <- discordant(raw_data, array_type = "huprot", fold = 4, abs = 2000)
 
 # 2. data correction
 corr_df <- replace.low(wide_df, offset = 10)
@@ -20,7 +24,7 @@ qnorm_df <- multinorm(corr_df, method= "ig")
 
 # 3. storage and backup
 qstore_df <- store.df(qnorm_df)
-writexl::write_xlsx(qstore_df, "your_file_name.xlsx")
+writexl::write_xlsx(qstore_df, "your_storage_file.xlsx")
 
 # 4. read data from backup file
 q_data <- readxl::read_xlsx(choose.files())
