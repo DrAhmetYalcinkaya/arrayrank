@@ -4,14 +4,16 @@
 \alias{extraction}
 \title{Extract Protein Data from Limma-read Array Data (RGList Object)}
 \usage{
-extraction(data, array_type, format = "wide")
+extraction(data, array_type, format = "wide", channel = "R")
 }
 \arguments{
-\item{data}{An \code{RGList} object containing microarray data, specifically with \code{genes} (vector), \code{targets} (list), and \code{R} (matrix) representing protein data, target files, and measurement values respectively.}
+\item{data}{An \code{RGList} object containing microarray data, specifically with \code{genes} (vector), \code{targets} (list), and \code{channel} (matrix) representing protein data, target files, and measurement values respectively.}
 
 \item{array_type}{A character string specifying the type of array used in the analysis. Must be one of "chambered", "segmented", or "huprot".}
 
 \item{format}{A character string specifying the format of the output. Either "wide" (default) or "long".}
+
+\item{channel}{A single character defining the color channel (usually \code{R}or \code{G}) to be extracted.}
 }
 \value{
 A data frame containing the extracted and arranged data in the specified format. The data frame contains calculated mean values for each group, with columns that vary depending on the specified \code{array_type} and \code{format}.
@@ -24,10 +26,10 @@ Extracts protein data from different types of arrays and outputs it in either lo
 # Assuming 'raw_data' is an RGList object obtained from read.gpr()
 Meaning run read.gpr first!
 
-# Extract data in long format for chambered arrays
+# Extract R channel (default) data in long format for chambered arrays
 long_data <- extraction(data = raw_data, array_type = "chambered", format = "long")
 
-# Extract data in wide format for huprot arrays
-wide_data <- extraction(data = raw_data, array_type = "huprot", format = "wide")
+# Extract G channel data in wide format for huprot arrays
+wide_data <- extraction(data = raw_data, array_type = "huprot", format = "wide", channel = "G")
 }
 }

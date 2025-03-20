@@ -1,6 +1,6 @@
 Package: arrayrank
 Title: Extract response data from planar arrays (.gpr) and detect hits
-Version: 0.9.10
+Version: 0.9.11
 Authors@R: 
     person("Ahmet", "Yalcinkaya", , "ahyalcinkaya@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1172-3330"))
