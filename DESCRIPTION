@@ -1,15 +1,16 @@
 Package: arrayrank
 Title: Extract response data from planar arrays (.gpr) and detect hits
-Version: 0.9.12
+Version: 1.0.0
 Authors@R: 
     person("Ahmet", "Yalcinkaya", , "ahyalcinkaya@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1172-3330"))
-Description: This package uses limma to extract autoantibody data from genepix (.gpr) protein arrays, either from single-sample arrays like Huprot or custom arrays and chambered/segmented arrays (used to analyze multiple patient samples in different blocks). Facilitates background correction, quality check (discordant duplicates), low-value replacement (offset), extraction to a dataframe, normalization with exclusion of non-sample or negative controls (limma betweenarrays, limma quantile, or variable-based), and storable dataset creation. Based on output manipulation, it is then possible to detect variables (proteins) for which increased immunoreactivity is detected based on a number of factors, including fold-change, absolute response, shared hits, and combinations of these features. Allows selection of a control group and target groups (defaults to all non-controls) to be examined for hits.
+Description: This package uses limma to extract autoantibody data from genepix (.gpr) protein arrays, either from single-sample arrays like Huprot or custom arrays and chambered/segmented arrays (used to analyze multiple patient samples in different blocks). Facilitates background correction, quality check (discordant duplicates), low-value replacement (offset), extraction to a dataframe, normalization with exclusion of non-sample or negative controls (limma betweenarrays, limma quantile, or variable-based), and storable dataset creation. Based on output manipulation, it is then possible to detect variables (proteins) for which increased immunoreactivity is detected based on a number of factors, including fold-change, absolute response, shared hits, and combinations of these features. Allows selection of a control group and target groups (defaults to all non-controls) to be examined for hits. It is also possible to pass data obtained from bead-based or other immunoassays to perform hit detection.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
+    isotree,
     limma,
     tidyr,
     dplyr,

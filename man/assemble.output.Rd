@@ -2,7 +2,7 @@
 % Please edit documentation in R/assemble.output.R
 \name{assemble.output}
 \alias{assemble.output}
-\title{Assemble Protein Data with Key Matching and Excel Export}
+\title{Assemble and Format Protein Data for Multiple Analysis Types}
 \usage{
 assemble.output(
   key,
@@ -13,31 +13,24 @@ assemble.output(
 )
 }
 \arguments{
-\item{key}{A data frame with at least an "Array" column and associated metadata. Preferably, the key file will contain "Array", "Group", and "Sample" columns in that order).}
+\item{key}{A data frame with at least an "Array" column and associated metadata,
+such as "Group" and "Sample".}
 
-\item{wide_df}{Raw protein expression data (proteins as rows, samples as columns, based on the read output).}
+\item{wide_df}{Raw protein expression data (proteins as rows, samples as columns).}
 
 \item{corr_df}{Offset-corrected data (same structure as wide_df).}
 
 \item{norm_df}{Normalized data (same structure as wide_df).}
 
-\item{file_name}{Name of the output Excel file (defaults to "Data_complete.xlsx").}
+\item{file_name}{Name of the output Excel file.}
 }
 \value{
-A named list of data frames (Raw, Offset, Norm) that are also written to Excel in your working directory.
+A named list of data frames. It includes 'Raw', 'Offset', 'Norm' (for Excel),
+as well as wide-format 'analysis_set' and tidy-format 'tidied_analysis_set'
+for each of the three data types.
 }
 \description{
-Matches sample keys to multiple datasets (raw, offset-corrected, normalized),
-adds protein names, and writes each dataset as a separate sheet in a single Excel file.
-}
-\examples{
-\dontrun{
-assembled_data <- assemble.output(
-  key = sample_key,
-  wide_df = raw_data,
-  corr_df = corrected_data,
-  norm_df = normalized_data,
-  file_name = "MyData.xlsx"
-)
-}
+This function prepares protein data in multiple formats. It creates wide-format
+data for Excel, and generates both wide and tidy analysis sets for each of the
+three input data types (raw, offset-corrected, normalized).
 }

@@ -1,54 +1,34 @@
-#' Assemble Protein Data with Key Matching and Excel Export
+#' Assemble and Format Protein Data for Multiple Analysis Types
 #'
-#' Matches sample keys to multiple datasets (raw, offset-corrected, normalized),
-#' adds protein names, and writes each dataset as a separate sheet in a single Excel file.
+#' This function prepares protein data in multiple formats. It creates wide-format
+#' data for Excel, and generates both wide and tidy analysis sets for each of the
+#' three input data types (raw, offset-corrected, normalized).
 #'
-#' @param key A data frame with at least an "Array" column and associated metadata. Preferably, the key file will contain "Array", "Group", and "Sample" columns in that order).
-#' @param wide_df Raw protein expression data (proteins as rows, samples as columns, based on the read output).
+#' @param key A data frame with at least an "Array" column and associated metadata,
+#'   such as "Group" and "Sample".
+#' @param wide_df Raw protein expression data (proteins as rows, samples as columns).
 #' @param corr_df Offset-corrected data (same structure as wide_df).
 #' @param norm_df Normalized data (same structure as wide_df).
-#' @param file_name Name of the output Excel file (defaults to "Data_complete.xlsx").
+#' @param file_name Name of the output Excel file.
 #'
-#' @return A named list of data frames (Raw, Offset, Norm) that are also written to Excel in your working directory.
+#' @return A named list of data frames. It includes 'Raw', 'Offset', 'Norm' (for Excel),
+#'   as well as wide-format 'analysis_set' and tidy-format 'tidied_analysis_set'
+#'   for each of the three data types.
 #' @export
 #'
-#' @importFrom dplyr left_join relocate
+#' @importFrom dplyr left_join
 #' @importFrom tibble rownames_to_column
 #' @importFrom writexl write_xlsx
 #'
-#' @examples
-#' \dontrun{
-#' assembled_data <- assemble.output(
-#'   key = sample_key,
-#'   wide_df = raw_data,
-#'   corr_df = corrected_data,
-#'   norm_df = normalized_data,
-#'   file_name = "MyData.xlsx"
-#' )
-#' }
 assemble.output <- function(key, wide_df, corr_df, norm_df,
                             file_name = "Data_complete.xlsx") {
 
-  .match_key <- function(key, data) {
-    # Transpose so samples are rows
+  # wide formating for excel
+  .match_key_wide <- function(key, data) {
     trans_data <- as.data.frame(t(data))
     trans_data <- tibble::rownames_to_column(trans_data, "Array")
-
-    # Find unmatched samples before join
-    unmatched_in_data <- setdiff(trans_data$Array, key$Array)
-    unmatched_in_key <- setdiff(key$Array, trans_data$Array)
-
-    if (length(unmatched_in_data) > 0) {
-      warning("!!! IMPORTANT WARNING: Arrays in data not found in key, meaning that group and sample names were not found for the following arrays:\n", paste(unmatched_in_data, collapse = ", "))
-    }
-    if (length(unmatched_in_key) > 0) {
-      warning("Secondary warning: ", length(unmatched_in_key)," arrays in key not found in data, which may be OK if the key file contains keys for other arrays not being examined.")
-    }
-
-    # Join metadata
     merged <- dplyr::left_join(trans_data, key, by = "Array")
 
-    # Separate metadata and protein expression
     meta_cols <- setdiff(names(key), "Array")
     meta_rows <- t(merged[, meta_cols, drop = FALSE])
     colnames(meta_rows) <- merged$Array
@@ -60,28 +40,59 @@ assemble.output <- function(key, wide_df, corr_df, norm_df,
     return(as.data.frame(out))
   }
 
+  # standard data set
+  .create_tidy_df <- function(key, data) {
+    trans_data <- as.data.frame(t(data))
+    trans_data <- tibble::rownames_to_column(trans_data, "Array")
+    tidy_df <- dplyr::left_join(key, trans_data, by = "Array")
+    return(tidy_df)
+  }
 
-  # --- Internal: add protein names ---
+  # protein names addition
   .add_protein_names <- function(data) {
     protein_names <- rownames(data)
     output <- cbind(Protein = protein_names, data)
     return(output)
   }
 
-  # --- Process all datasets ---
-  stored_raw <- .add_protein_names(.match_key(key, wide_df))
-  stored_offset_corr <- .add_protein_names(.match_key(key, corr_df))
-  stored_norm <- .add_protein_names(.match_key(key, norm_df))
+  # file outputs (writable stuff)
+  stored_raw <- .add_protein_names(.match_key_wide(key, wide_df))
+  stored_offset_corr <- .add_protein_names(.match_key_wide(key, corr_df))
+  stored_norm <- .add_protein_names(.match_key_wide(key, norm_df))
 
+  # detect.hits-compatible data sets
+  analysis_set_raw <- stored_raw[-2, ]
+  analysis_set_offset <- stored_offset_corr[-2, ]
+  analysis_set_norm <- stored_norm[-2, ]
+
+  # isolate.hits-compatible data sets
+  tidied_analysis_set_raw <- .create_tidy_df(key, wide_df)
+  tidied_analysis_set_offset <- .create_tidy_df(key, corr_df)
+  tidied_analysis_set_norm <- .create_tidy_df(key, norm_df)
+
+  # Combine for in-R output
   stored_data <- list(
-    Raw = stored_raw,
-    Offset = stored_offset_corr,
-    Norm = stored_norm
+    # Ogoes to excel
+    Raw_Excel = stored_raw,
+    Offset_Excel = stored_offset_corr,
+    Norm_Excel = stored_norm,
+
+    # goes to detect.hits
+    analysis_set_raw = analysis_set_raw,
+    analysis_set_offset = analysis_set_offset,
+    analysis_set_norm = analysis_set_norm,
+
+    # goes to isolation forest
+    tidied_analysis_set_raw = tidied_analysis_set_raw,
+    tidied_analysis_set_offset = tidied_analysis_set_offset,
+    tidied_analysis_set_norm = tidied_analysis_set_norm
   )
 
-  # --- Export to Excel ---
-  writexl::write_xlsx(stored_data, file_name)
+  writexl::write_xlsx(
+    list(Raw = stored_raw, Offset = stored_offset_corr, Norm = stored_norm),
+    file_name
+  )
 
-  message("Data written to Excel file in your working directory: ", file_name)
+  message("Data written to Excel file: ", file_name)
   return(stored_data)
 }
