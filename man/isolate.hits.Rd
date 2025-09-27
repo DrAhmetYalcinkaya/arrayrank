@@ -44,7 +44,7 @@ used in setting the sigmoid inflection point. Default is 2.}
 to define the initial set of anomalies for threshold setting. Default is 0.6.}
 
 \item{fold_threshold}{A numeric value specifying the fold change threshold for
-detecting significant hits in the final classification. Default is 5.}
+detecting significant hits in the final classification. Default is 10.}
 
 \item{ntrees}{A numeric value for the number of trees to build in the
 isolation forest. Default is 200.}
@@ -56,14 +56,14 @@ negative value (e.g., -0.5) actively penalizes the analyte's rank score.}
 \item{detailed_results}{A logical value. If FALSE (default), the function runs in
 a high-performance mode and returns only a single, ranked data frame of hits.
 If TRUE, it returns a full list object containing detailed, sample-level
-results for every analyte, which is more memory-intensive.}
+results for every analyte.}
 }
 \value{
 By default (\code{detailed_results = FALSE}), a single data frame of ranked
 significant hits. If \code{detailed_results = TRUE}, a list containing two summary
-data frames (\code{summary_hits_only}, \code{summary_all_analytes}) in addition to detailed
-results for each analyte --takes a LOT of time if thousands of analytes are
-present in the data.
+data frames (\code{summary_hits_only}, \code{summary_all_analytes}) and detailed results
+for each analyte. Both summary types will include columns for each sample's
+raw value, with examine groups appearing before control groups.
 }
 \description{
 This function takes a tidy data frame and identifies significant hits using a
