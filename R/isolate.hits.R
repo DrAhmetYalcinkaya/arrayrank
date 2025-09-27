@@ -17,14 +17,14 @@
 #' @param anomaly_scale A numeric value for the composite anomaly score threshold, used
 #'   to define the initial set of anomalies for threshold setting. Default is 0.6.
 #' @param fold_threshold A numeric value specifying the fold change threshold for
-#'   detecting significant hits in the final classification. Default is 5.
+#'   detecting significant hits in the final classification. Default is 10.
 #' @param penalize A numeric factor used to adjust the score of hits found in the
 #'   control group. A value of 0 (default) nullifies their contribution, while a
 #'   negative value (e.g., -0.5) actively penalizes the analyte's rank score.
 #' @param detailed_results A logical value. If FALSE (default), the function runs in
 #'   a high-performance mode and returns only a single, ranked data frame of hits.
 #'   If TRUE, it returns a full list object containing detailed, sample-level
-#'   results for every analyte, which is more memory-intensive.
+#'   results for every analyte.
 #' @param mad_multiplier A numeric multiplier for the Median Absolute Deviation (MAD)
 #'   used in setting the sigmoid inflection point. Default is 2.
 #' @param sigmoid_k A numeric value for the slope of the sigmoid curve. Default is 0.0005.
@@ -33,12 +33,13 @@
 #'
 #' @return By default (`detailed_results = FALSE`), a single data frame of ranked
 #'   significant hits. If `detailed_results = TRUE`, a list containing two summary
-#'   data frames (`summary_hits_only`, `summary_all_analytes`) in addition to detailed
-#'   results for each analyte --takes a LOT of time if thousands of analytes are
-#'   present in the data.
+#'   data frames (`summary_hits_only`, `summary_all_analytes`) and detailed results
+#'   for each analyte. Both summary types will include columns for each sample's
+#'   raw value, with examine groups appearing before control groups.
 #' @export
 #'
-#' @importFrom dplyr %>% filter mutate select
+#' @importFrom dplyr %>% filter mutate select left_join arrange
+#' @importFrom tidyr pivot_longer pivot_wider
 #' @importFrom isotree isolation.forest
 #'
 #' @examples
@@ -67,24 +68,28 @@ isolate.hits <- function(data,
                          penalize = 0,
                          detailed_results = FALSE) {
 
-  # input check
-  analysis_data <- data
-  if (!is.null(examine)) {
-    if (!all(examine %in% unique(analysis_data[[cohort_col]]))) {
-      stop("One or more examine groups not found.")
-    }
-    analysis_data <- analysis_data %>%
-      filter(!!sym(cohort_col) %in% c(controls, examine))
-    message("Running targeted analysis on cohort(s): ", paste(examine, collapse=", "))
+  # Determine the full set of groups to analyze
+  if (is.null(examine)) {
+    examine <- setdiff(unique(data[[cohort_col]]), controls)
   }
+
+  # --- 1. Validate inputs and filter data ---
+  analysis_data <- data
+  if (!all(examine %in% unique(analysis_data[[cohort_col]]))) {
+    stop("One or more examine groups not found.")
+  }
+  analysis_data <- analysis_data %>%
+    filter(!!sym(cohort_col) %in% c(controls, examine))
+  message("Running targeted analysis on cohort(s): ", paste(examine, collapse=", "))
 
   id_cols <- c(sample_id_col, cohort_col)
   numerical_analytes <- setdiff(names(analysis_data)[sapply(analysis_data, is.numeric)], id_cols)
   if (length(numerical_analytes) == 0) { stop("No numerical columns found to analyze.") }
   message("Analyzing ", length(numerical_analytes), " analytes across ", nrow(analysis_data), " samples...")
 
-  # analysis duality, complete output with detailed results first
+  # --- 2. Main Analysis Logic (Two Paths) ---
   if (detailed_results) {
+    # --- Full Path: Detailed Results ---
     individual_results <- lapply(numerical_analytes, function(analyte_name) {
       result_shell <- analysis_data %>% select(all_of(id_cols))
       x_raw <- analysis_data[[analyte_name]]
@@ -171,23 +176,15 @@ isolate.hits <- function(data,
       summary_hits_only_df$rank <- 1:nrow(summary_hits_only_df)
     }
 
-    final_output <- c(
-      list(summary_hits_only = summary_hits_only_df),
-      list(summary_all_analytes = summary_all_df),
-      individual_results
-    )
-    return(final_output)
-
   } else {
-    # default output, without tables for each protein. Only summary values for proteins with at least 1 hit in the examine group
+    # --- Fast Path: Summary Only (Default) ---
     summary_list <- lapply(numerical_analytes, function(analyte_name) {
       x_raw <- analysis_data[[analyte_name]]
       n_complete <- sum(!is.na(x_raw))
       if (sd(x_raw, na.rm = TRUE) == 0 || n_complete < 5) { return(NULL) }
-      #isolation tree here
+
       iso <- isotree::isolation.forest(data.frame(value = x_raw), sample_size = n_complete, ntrees = ntrees)
       scores <- predict(iso, data.frame(value = x_raw), type = "score")
-
       controls_mask <- analysis_data[[cohort_col]] == controls & !is.na(scores)
       control_raws_med <- median(x_raw[controls_mask], na.rm = TRUE)
       med <- median(x_raw, na.rm = TRUE)
@@ -197,7 +194,6 @@ isolate.hits <- function(data,
       score_sigmoid_comp <- scores * raw_sigmoid
       FCvsControl <- x_raw / (control_raws_med + 1e-9)
 
-      #finding hits: 2-step approach
       anomaly <- score_sigmoid_comp >= anomaly_scale & !is.na(score_sigmoid_comp)
       absolute_raw_threshold <- min(x_raw[anomaly], na.rm = TRUE)
       hit_flag <- (x_raw >= absolute_raw_threshold) & (FCvsControl >= fold_threshold)
@@ -224,7 +220,6 @@ isolate.hits <- function(data,
       control_hit_values[is.infinite(control_hit_values) | is.nan(control_hit_values)] <- 0
       control_penalty <- sum(control_hit_values * penalize, na.rm = TRUE)
 
-      #applying penalty
       total_hit_val <- target_score + control_penalty
 
       if (num_hits_val == 0) {
@@ -250,16 +245,48 @@ isolate.hits <- function(data,
         )
       }
     })
-    # summary info for all proteins
+
     summary_all_df <- do.call(rbind, summary_list)
-    # summary info for proteins with hits in the examine group
     summary_hits_only_df <- summary_all_df %>% filter(num_hits > 0)
 
     if(nrow(summary_hits_only_df) > 0) {
       summary_hits_only_df <- summary_hits_only_df[order(summary_hits_only_df$rank_hit_value, decreasing = TRUE), ]
       summary_hits_only_df$rank <- 1:nrow(summary_hits_only_df)
     }
+  }
 
+  # reshape and order for valeu join
+  cohort_order <- c(examine, controls)
+
+  long_raw_data <- analysis_data %>%
+    select(all_of(id_cols), all_of(numerical_analytes)) %>%
+    mutate(!!sym(cohort_col) := factor(!!sym(cohort_col), levels = cohort_order)) %>%
+    arrange(!!sym(cohort_col)) %>%
+    tidyr::pivot_longer(
+      cols = all_of(numerical_analytes),
+      names_to = "analyte",
+      values_to = "raw_value"
+    )
+
+  wide_raw_data <- long_raw_data %>%
+    tidyr::pivot_wider(
+      id_cols = "analyte",
+      names_from = all_of(sample_id_col),
+      values_from = "raw_value"
+    )
+
+  # Join to summary tables
+  summary_all_df <- dplyr::left_join(summary_all_df, wide_raw_data, by = "analyte")
+  summary_hits_only_df <- dplyr::left_join(summary_hits_only_df, wide_raw_data, by = "analyte")
+
+  if (detailed_results) {
+    final_output <- c(
+      list(summary_hits_only = summary_hits_only_df),
+      list(summary_all_analytes = summary_all_df),
+      individual_results
+    )
+    return(final_output)
+  } else {
     return(summary_hits_only_df)
   }
 }
