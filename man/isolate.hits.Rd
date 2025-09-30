@@ -8,7 +8,7 @@ isolate.hits(
   data,
   sample_id_col,
   cohort_col,
-  controls,
+  controls = NULL,
   examine = NULL,
   mad_multiplier = 2,
   sigmoid_k = 5e-04,
@@ -29,7 +29,8 @@ identifier column, a cohort column, and numeric columns for each analyte.}
 \item{cohort_col}{A character string specifying the name of the column in
 \code{data} that contains the group/cohort labels.}
 
-\item{controls}{A character string specifying the label of the control group.}
+\item{controls}{A character string specifying the label of the control group.
+defaults to NULL if working without a control group.}
 
 \item{examine}{An optional character vector specifying the non-control
 group labels to be analyzed. If NULL, all groups except the control group
