@@ -171,17 +171,31 @@ isolate.hits <- function(data,
           analyte = analyte_name, num_hits = 0, control_hit_penalty = control_penalty,
           total_hit_value = total_hit_val, rank_hit_value = 0,
           min_hit_raw_value = NA_real_, max_hit_raw_value = NA_real_,
+          implied_cutoff = NA_real_,
           min_hit_score = NA_real_, max_hit_score = NA_real_,
           min_hit_fc = NA_real_, max_hit_fc = NA_real_
         )
       } else {
+        all_hits <- result_df[result_df$hit_flag, ]
+        non_hits <- result_df[!result_df$hit_flag, ]
+
+        min_hit_val <- min(all_hits$raw_value, na.rm = TRUE)
+        highest_non_hit_val <- max(non_hits$raw_value, na.rm = TRUE)
+
+        implied_cutoff_val <- if(is.infinite(highest_non_hit_val)) {
+          NA_real_
+        } else {
+          mean(c(min_hit_val, highest_non_hit_val))
+        }
+
         rank_hit_val <- total_hit_val * num_hits_val
         data.frame(
           analyte = analyte_name, num_hits = num_hits_val,
           control_hit_penalty = control_penalty, total_hit_value = total_hit_val,
           rank_hit_value = rank_hit_val,
-          min_hit_raw_value = min(target_hits$raw_value, na.rm = TRUE),
-          max_hit_raw_value = max(target_hits$raw_value, na.rm = TRUE),
+          min_hit_raw_value = min_hit_val,
+          max_hit_raw_value = max(all_hits$raw_value, na.rm = TRUE),
+          implied_cutoff = implied_cutoff_val,
           min_hit_score = min(target_hits$score_sigmoided, na.rm = TRUE),
           max_hit_score = max(target_hits$score_sigmoided, na.rm = TRUE),
           min_hit_fc = min(target_hits$fold_change, na.rm = TRUE),
@@ -249,17 +263,31 @@ isolate.hits <- function(data,
           analyte = analyte_name, num_hits = 0, control_hit_penalty = control_penalty,
           total_hit_value = total_hit_val, rank_hit_value = 0,
           min_hit_raw_value = NA_real_, max_hit_raw_value = NA_real_,
+          implied_cutoff = NA_real_,
           min_hit_score = NA_real_, max_hit_score = NA_real_,
           min_hit_fc = NA_real_, max_hit_fc = NA_real_
         )
       } else {
+        all_hits <- temp_df[temp_df$hit_flag, ]
+        non_hits <- temp_df[!temp_df$hit_flag, ]
+
+        min_hit_val <- min(all_hits$raw_value, na.rm = TRUE)
+        highest_non_hit_val <- max(non_hits$raw_value, na.rm = TRUE)
+
+        implied_cutoff_val <- if(is.infinite(highest_non_hit_val)) {
+          NA_real_
+        } else {
+          mean(c(min_hit_val, highest_non_hit_val))
+        }
+
         rank_hit_val <- total_hit_val * num_hits_val
         data.frame(
           analyte = analyte_name, num_hits = num_hits_val,
           control_hit_penalty = control_penalty, total_hit_value = total_hit_val,
           rank_hit_value = rank_hit_val,
-          min_hit_raw_value = min(target_hits$raw_value, na.rm = TRUE),
-          max_hit_raw_value = max(target_hits$raw_value, na.rm = TRUE),
+          min_hit_raw_value = min_hit_val,
+          max_hit_raw_value = max(all_hits$raw_value, na.rm = TRUE),
+          implied_cutoff = implied_cutoff_val,
           min_hit_score = min(target_hits$score_sigmoided, na.rm = TRUE),
           max_hit_score = max(target_hits$score_sigmoided, na.rm = TRUE),
           min_hit_fc = min(target_hits$fold_change, na.rm = TRUE),
