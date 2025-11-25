@@ -1,6 +1,14 @@
 # arrayrank
  Extracts .gpr array data and detects possible elevated responses ('hits') in selected subject groups relative to controls
 
+To load into R environment:
+devtools::install_github("DrAhmetYalcinkaya/arrayrank")
+library(arrayrank)
+
+You will also need Limma from Bioconductor:
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("limma")
 
 FAQ:
 1) When I run read.gpr, I get errors about file names, directories, and extensions. Why?
